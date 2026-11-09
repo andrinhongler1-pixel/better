@@ -1,0 +1,8 @@
+{
+  "feature": "persistent-sleep",
+  "source": "7aab10b12c310dad74a34bbfcd0cbc2b3abe2b33",
+  "build": "7f80fab93f77d39b4dd6d0f54b130510f4105abb",
+  "version": "e0660966a204a275ce8e4a7c001595ac",
+  "checks": "TypeScript and 42 tests passed locally and on GitHub; physical device/UI checks pending",
+  "date": "2026-11-09"
+}
