@@ -13,8 +13,8 @@ export default function MainLayout() {
     <Tabs screenOptions={{ headerShown: false, sceneStyle: { backgroundColor: colors.background } }}
       tabBar={({ state, navigation }) => <View style={styles.dock} pointerEvents="box-none"><View style={styles.navigation} accessibilityRole="tablist">
         {state.routes.map((route, index) => {
-          if (route.name === 'progress') return null;
-          const active = state.index === index;
+          if (route.name === 'progress' || route.name === 'running') return null;
+          const active = state.index === index || (route.name === 'today' && state.routes[state.index]?.name === 'running');
           return <Pressable key={route.key} accessibilityRole="tab" accessibilityState={{ selected: active }} aria-selected={active}
             onPress={() => {
               const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
@@ -26,6 +26,7 @@ export default function MainLayout() {
       </View></View>}>
       {tabs.map(tab => <Tabs.Screen key={tab} name={tab} options={{ title: tab.toUpperCase() }} />)}
       <Tabs.Screen name="progress" options={{ href: null }} />
+      <Tabs.Screen name="running" options={{ href: null }} />
     </Tabs>
   </SafeAreaView>;
 }
