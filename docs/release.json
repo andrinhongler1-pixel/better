@@ -1,8 +1,8 @@
 {
-  "feature": "persistent-sleep",
-  "source": "7aab10b12c310dad74a34bbfcd0cbc2b3abe2b33",
-  "build": "7f80fab93f77d39b4dd6d0f54b130510f4105abb",
-  "version": "e0660966a204a275ce8e4a7c001595ac",
-  "checks": "TypeScript and 42 tests passed locally and on GitHub; physical device/UI checks pending",
-  "date": "2026-11-09"
+  "feature": "foreground-running",
+  "source": "ca05843748ffe87691d37e9bbdb4d05b0949d1e6",
+  "build": "fd09ca3554b26537bfb9a7f557bca52e909902b8",
+  "version": "06b70d93e536b7dd7d3c81b891ad47b1",
+  "date": "2026-11-10",
+  "checks": "TypeScript and 48 tests passed; synthetic browser GPS at 320/390px passed; physical iPhone GPS test pending"
 }
