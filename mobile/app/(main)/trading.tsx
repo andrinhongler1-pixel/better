@@ -8,11 +8,14 @@ import { TradingRepository } from '../../src/features/trading/repository';
 import { isManualTrade, parseImport, pnl } from '../../src/features/trading/model';
 import { TradingDashboard } from '../../src/features/trading/TradingDashboard';
 import type { Currency, DailySummary, ManualTradeInput, Trade } from '../../src/features/trading/model';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { Disclosure } from '../../src/components/Disclosure';
 
 const repository = new TradingRepository(AsyncStorage);
 function blank(): ManualTradeInput { const d = new Date(); return { symbol: '', result: 'PROFIT', amount: '', date: `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`, note: '' }; }
 const money = (n: number, currency: string) => `${n > 0 ? '+' : ''}${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency}`;
 export default function Trading() {
+  const params = useLocalSearchParams<{ action?: string; tradeId?: string; summaryId?: string; view?: string }>(); const router = useRouter();
   const { trades, summaries, status } = useSyncExternalStore(repository.subscribe, repository.getSnapshot, repository.getSnapshot);
   const [importing, setImporting] = useState(false);
   const [importText, setImportText] = useState('');
@@ -27,6 +30,14 @@ export default function Trading() {
   const [busy, setBusy] = useState(false);
   const locked = useRef(false);
   useEffect(() => { void repository.load(); }, []);
+  useEffect(() => {
+    if (status !== 'ready' || (!params.action && !params.tradeId && !params.summaryId && !params.view)) return;
+    close();
+    if (params.action === 'new') setForm(blank());
+    else if (params.tradeId) { const item = trades.find(t => t.id === params.tradeId); if (item) setSelected(item); else setError('Dieser Trade wurde nicht gefunden.'); }
+    else if (params.summaryId) { const item = summaries.find(s => s.id === params.summaryId); if (item) setSummary(item); else setError('Dieser Tageswert wurde nicht gefunden.'); }
+    router.setParams({ action: undefined, tradeId: undefined, summaryId: undefined, view: undefined });
+  }, [params.action, params.tradeId, params.summaryId, params.view, status, trades, summaries, router]);
   const field = (key: keyof ManualTradeInput, value: string) => { setForm(f => f && ({ ...f, [key]: value })); setError(null); };
   const close = () => { setForm(null); setSelected(null); setEditing(undefined); setEditingCurrency('USD'); setConfirmDelete(false); setError(null); setImporting(false); setPreview(null); setSummary(null); };
   async function mutate(action: () => Promise<void>) {
@@ -58,9 +69,9 @@ export default function Trading() {
       {input('amount', `AMOUNT (${editingCurrency})`, true)}
       <Secondary>Enter a positive amount after fees. {form.result === 'LOSS' ? 'LOSS saves it as negative P&L automatically.' : 'PROFIT saves it as positive P&L.'}</Secondary>
       {editingCurrency !== 'USD' && <Secondary>This historical trade stays in {editingCurrency}. No currency conversion is applied.</Secondary>}
-      {input('date', 'TRADE DATE (YYYY-MM-DD)')}{input('symbol', 'MARKET / LABEL (OPTIONAL)')}{input('note', 'NOTE / LESSON (OPTIONAL)', false, true)}
+      {input('date', 'TRADE DATE (YYYY-MM-DD)')}<Disclosure title="Markt & Notiz (optional)">{input('symbol', 'MARKET / LABEL (OPTIONAL)')}{input('note', 'NOTE / LESSON (OPTIONAL)', false, true)}</Disclosure>
       <ErrorMessage message={error} />
-      <OutlineButton label={busy ? 'SAVING' : 'SAVE TRADE'} disabled={busy} onPress={() => { void mutate(() => repository.saveManual(form, editing)); }} />
+      <OutlineButton primary label={busy ? 'SAVING' : 'SAVE TRADE'} disabled={busy} onPress={() => { void mutate(() => repository.saveManual(form, editing)); }} />
       <OutlineButton label="CANCEL" disabled={busy} onPress={close} />
     </View> : selected ? <View style={[ui.section, ui.card]}>
       <Label>{selected.date} / {selected.direction}</Label><Text style={ui.heading}>{selected.symbol}</Text><Text style={styles.amount}>{money(pnl(selected), selected.currency)}</Text><Label>NET P&L</Label>

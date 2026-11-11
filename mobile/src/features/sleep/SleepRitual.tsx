@@ -11,6 +11,7 @@ import { clockLabel, dateLabel, durationLabel, offsetLabel, parseTimestamp, time
 import type { SleepSession } from './model';
 import { TimeFields } from './TimeFields';
 import type { TimeValue } from './TimeFields';
+import { Disclosure } from '../../components/Disclosure';
 
 export function SleepRitual() {
   const { data, status, repository, restingId, ritualEpoch, startSleep } = useSleep();
@@ -44,14 +45,16 @@ export function SleepRitual() {
         <Secondary>{resting ? 'Put the day down. Your start time is saved; you can close the app.' : 'Ready for a new day? Save your wake time when you are up.'}</Secondary>
         <View style={ui.card}><Label>SLEEP START</Label><Text style={ui.title}>{clockLabel(active.sleepStart)} · {dateLabel(active.sleepStart)}</Text><Label>UTC {offsetLabel(active.sleepStart)}</Label></View>
         {correction ? <View style={ui.card}><TimeFields label="SLEEP START" value={correction.value} onChange={value => setCorrection({ ...correction, value })} disabled={busy} /><OutlineButton label="SAVE START TIME" disabled={busy} onPress={() => { void run(async () => { await repository.correctStart(correction.id, parseTimestamp(correction.value.time, correction.value.offset), correction.revision); setCorrection(null); }); }} /><OutlineButton label="CANCEL EDIT" disabled={busy} onPress={() => setCorrection(null)} /></View> : cancel ? <View style={ui.card}><Secondary>Discard the current start? No completed sleep record will be created.</Secondary><OutlineButton label="DISCARD CURRENT START" disabled={busy} onPress={() => { void run(async () => { await repository.cancel(active.id); setCancel(false); }); }} /><OutlineButton label="KEEP SLEEPING" disabled={busy} onPress={() => setCancel(false)} /></View> : <>
-          <OutlineButton label={busy ? 'SAVING' : 'WAKE UP'} disabled={disabled} onPress={() => { const id = active.id; void run(async () => { setSummary(await repository.wake(id)); }); }} />
+          <OutlineButton primary label={busy ? 'SAVING' : 'WAKE UP'} disabled={disabled} onPress={() => { const id = active.id; void run(async () => { setSummary(await repository.wake(id)); }); }} />
+          <Disclosure title="Zeit korrigieren oder Start verwerfen">
           <OutlineButton label="CORRECT START TIME" disabled={disabled} onPress={() => { setError(null); setCorrection({ id: active.id, revision: data.revision, value: timestampFields(active.sleepStart) }); }} />
           <OutlineButton label="STARTED BY MISTAKE" disabled={disabled} onPress={() => { setError(null); setCancel(true); }} />
+          </Disclosure>
         </>}
       </> : <>
-        <Secondary>Ready to rest? Start only when you are going to sleep. Closing the app records nothing.</Secondary>
+        <Secondary>Öffne deinen Tag. Oder starte deine Schlafzeit bewusst, wenn du schlafen gehst.</Secondary>
+        <OutlineButton primary label="NOT NOW · OPEN APP" disabled={disabled} highlighted={transition.highlighted} onPress={transition.start} />
         <OutlineButton label={busy ? 'SAVING' : 'GO TO SLEEP'} disabled={disabled} onPress={() => { void run(() => startSleep(data.revision)); }} />
-        <OutlineButton label="NOT NOW · OPEN APP" disabled={disabled} highlighted={transition.highlighted} onPress={transition.start} />
       </>}
       <ErrorMessage message={error} />
     </View>
