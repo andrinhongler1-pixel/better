@@ -1,8 +1,8 @@
 {
-  "feature": "simplified-navigation",
-  "source": "83bb4c7853c0025df94787e4f5e29494924c30f7",
-  "build": "739fcb4f44c15f563c27de86b0faa48e93c271cd",
-  "version": "0f13a08436faa66140a8863043614768",
-  "date": "2026-11-11",
-  "checks": "TypeScript, 52 tests and web export passed; responsive navigation and existing-record links tested; physical iPhone test pending"
+  "feature": "weekly-daily-planner",
+  "source": "a92c8a1fb67f98fa2bf939077d6939530c98f6dc",
+  "build": "ecd78d3795aee13542bcfc618ab77553495fbd74",
+  "version": "f8c1d82e5c5e90d323862a9d3e03c439",
+  "date": "2026-11-12",
+  "checks": "TypeScript, 59 tests and web export passed; local browser task CRUD/completion/move/reload/history and 320/390px checks; physical iPhone test pending"
 }
