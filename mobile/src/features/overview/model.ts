@@ -3,9 +3,10 @@ import { parseSleep, durationLabel, localDay } from '../sleep/model.ts';
 import { parseRuns, clock } from '../running/model.ts';
 import { parseData as parseFood } from '../nutrition/model.ts';
 import { parseData as parseQuit } from '../quit/model.ts';
-export const overviewKeys = { trading: 'better:v1:trading', sleep: 'better:v1:sleep', running: 'better:v1:running', nutrition: 'better:v1:nutrition', quit: 'better:v1:quit' } as const;
+import { parsePlan, taskTime } from '../planner/model.ts';
+export const overviewKeys = { trading: 'better:v1:trading', sleep: 'better:v1:sleep', running: 'better:v1:running', nutrition: 'better:v1:nutrition', quit: 'better:v1:quit', planner: 'better:v1:planner' } as const;
 export type HistoryKind = keyof typeof overviewKeys;
-export const kindNames: Record<HistoryKind, string> = { trading: 'Trading', sleep: 'Schlaf', running: 'Laufen', nutrition: 'Ernährung', quit: 'Quit' };
+export const kindNames: Record<HistoryKind, string> = { trading: 'Trading', sleep: 'Schlaf', running: 'Laufen', nutrition: 'Ernährung', quit: 'Quit', planner: 'Planer' };
 export interface HistoryItem { id: string; kind: HistoryKind; date: string; order: number; title: string; detail: string; value: string; href: string }
 export interface Overview { items: HistoryItem[]; errors: HistoryKind[]; foodCount: number; tradeCount: number; lastSleep: string | null }
 const link = (route: string, params: Record<string, string>) => `${route}?${Object.entries({ ...params, from: 'history' }).map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(v)}`).join('&')}`;
@@ -28,5 +29,6 @@ export function buildOverview(raw: Partial<Record<HistoryKind, string | null>>, 
     out.items.push(...entries.map(e => ({ id: `food:${e.id}`, kind: 'nutrition' as const, date: e.date, order: e.createdAt, title: e.product.name, detail: `${e.grams} g · Ernährung`, value: e.nutrition.calories === null ? 'kcal unbekannt' : `${Math.round(e.nutrition.calories)} kcal`, href: link('/nutrition', { day: e.date }) })));
   });
   read('quit', () => { for (const timer of parseQuit(raw.quit ?? null).timers) out.items.push(...timer.history.map(a => ({ id: `quit:${timer.id}:${a.id}`, kind: 'quit' as const, date: localDay(a.endedAt), order: a.endedAt, title: timer.title, detail: 'Abgeschlossener Versuch', value: durationLabel(a.duration), href: `/quit/${encodeURIComponent(timer.id)}/attempt/${encodeURIComponent(a.id)}` }))); });
+  read('planner', () => { out.items.push(...parsePlan(raw.planner ?? null).tasks.filter(t => t.done).map(t => ({ id: `plan:${t.id}`, kind: 'planner' as const, date: localDay(t.completedAt!), order: t.completedAt!, title: t.title, detail: `Geplant: ${t.date} · ${taskTime(t)}`, value: 'Erledigt', href: link('/planner', { date: t.date, mode: 'day', itemId: t.id }) }))); });
   out.items.sort((a, b) => b.date.localeCompare(a.date) || b.order - a.order || a.id.localeCompare(b.id)); return out;
 }

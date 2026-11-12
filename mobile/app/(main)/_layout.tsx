@@ -4,7 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSession } from '../../src/features/session/SessionProvider';
 import { useSleep } from '../../src/features/sleep/SleepProvider';
 import { mainSections, sectionForRoute } from '../../src/features/overview/navigation';
-const tools = ['goals', 'quit', 'trading', 'nutrition', 'sleep', 'progress', 'running'] as const;
+const tools = ['goals', 'quit', 'trading', 'nutrition', 'sleep', 'progress', 'running', 'planner'] as const;
 export default function MainLayout() {
   const { unlocked } = useSession(); const { data, status } = useSleep();
   if (!unlocked || data.active || status === 'loading') return <Redirect href="/" />;

@@ -8,7 +8,7 @@ export function ToolPage({ title, children, back }: { title: string; children: R
   const params = useLocalSearchParams<{ from?: string }>();
   const main = ['TODAY', 'AREAS', 'HISTORY'].includes(title);
   const target = params.from === 'history' ? '/history' : params.from === 'today' ? '/today' : back || (!main ? '/areas' : undefined);
-  const titles: Record<string, string> = { TODAY: 'Heute', AREAS: 'Bereiche', HISTORY: 'Verlauf', SLEEP: 'Schlaf', NUTRITION: 'Ernährung', RUNNING: 'Laufen', TRADING: 'Trading', GOALS: 'Ziele', QUIT: 'Quit', PROGRESS: 'Fortschritt' };
+  const titles: Record<string, string> = { TODAY: 'Heute', AREAS: 'Bereiche', HISTORY: 'Verlauf', SLEEP: 'Schlaf', NUTRITION: 'Ernährung', RUNNING: 'Laufen', TRADING: 'Trading', GOALS: 'Ziele', QUIT: 'Quit', PROGRESS: 'Fortschritt', PLANNER: 'Planer' };
   return <KeyboardAvoidingView style={ui.fill} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
     <ScrollView keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false} contentContainerStyle={ui.page}>
       <View style={ui.top}><Text style={ui.brand}>better.</Text>{target && <Pressable accessibilityRole="button" accessibilityLabel="Zurück" onPress={() => router.replace(target as never)} style={ui.textButton}><Text style={ui.small}>{target === '/areas' ? 'BEREICHE' : 'ZURÜCK'}</Text></Pressable>}</View>

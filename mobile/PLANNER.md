@@ -1,0 +1,17 @@
+# Weekly and daily planner
+
+Open HEUTE → Tagesplan öffnen for today's agenda, or BEREICHE → Planer for the week. The three main navigation sections remain unchanged. Weeks run Monday–Sunday, with previous/next navigation, a today shortcut and a selectable day strip. Day view orders open timed tasks chronologically, then untimed tasks, then completed tasks. Week view groups the same real entries by their planned day.
+
+Create tasks/appointments with a title, date, optional start time, optional duration and note. Duration requires a start time, uses whole minutes and cannot extend beyond the selected day's midnight boundary. Untimed tasks are supported. Entries can be checked/unchecked, edited, moved to another date and deleted after confirmation. Completion is explicit; no sample/recurring tasks or automatic completions are generated. This is local planning, not a notification/alarm or external-calendar integration.
+
+The new isolated `better:v1:planner` key stores version 1 task records: unique ID, title, calendar date, optional time/duration, note, completion state/timestamp, creation/update timestamps and entry revision. Existing keys, trading summaries/counts, timers, notes, nutrition, goals, sleep and running data are not migrated or changed. Web Locks serialize same-origin writes; every mutation rereads storage. Per-entry revisions reject stale edits/deletions across windows. Add IDs and explicit completion state make repeated saves/taps idempotent. Failed writes/corrupt storage never silently reset existing records. Native uses the existing process queue pattern.
+
+Calendar arithmetic uses ISO date strings and UTC-noon operations, avoiding DST-induced day shifts. Device-local today and completion timestamps are kept separate from the planned calendar date. Invalid dates/times, empty titles, unsupported durations and malformed stored records are rejected. Web date/time inputs support both input and change events and use native browser pickers. Optional note/duration fields stay controlled when collapsed.
+
+Home shows today's real next open tasks and completion count. Only completed planner tasks appear in unified VERLAUF; undo removes their completion from that projection, without fabricating separate tasks. History links reopen the original task and preserve its planned date. No personal planner data or local browser fixtures are included in the public release.
+
+## Verification
+
+Local TypeScript and all 59 tests passed. Seven planner tests cover Monday-first/calendar/DST/leap/year arithmetic; timed/untimed validation; no writes on empty load; idempotent durable adds; editing/moving with preserved identity/notes; explicit completion/undo/history; ordering; concurrent windows/stale revisions; deletion; failed writes and corrupt-data preservation. Existing feature regression tests still pass.
+
+Local browser at 390px: native time input captured 09:00, 60 minutes and a note; saved entry rendered 09:00–10:00; checkbox completed/undid it and updated Home; editing its date to the next day/time to 10:30 retained the note and duration and moved it into the correct weekly group as 10:30–11:30; untimed task saved/completed and appeared once in unified history alongside existing test trades/runs; history reopened the original task; delete confirmation was opened and cancelled. Actual deletion is covered by repository tests. Physical iPhone Safari/PWA tests are not claimed.

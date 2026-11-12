@@ -7,8 +7,8 @@ import { createTimer, resetTimer } from '../src/features/quit/model.ts';
 const now = new Date(2026, 10, 11, 12).getTime();
 test('three navigation sections retain every working area and legacy routes stay classified', () => {
   assert.deepEqual(mainSections.map(s => s.route), ['today', 'areas', 'history']);
-  assert.deepEqual(areaLinks.map(s => s.route).sort(), ['/nutrition', '/quit', '/running', '/sleep', '/trading']);
-  for (const route of ['running', 'nutrition', 'quit', 'sleep', 'trading', 'goals', 'progress']) assert.equal(sectionForRoute(route), 'areas');
+  assert.deepEqual(areaLinks.map(s => s.route).sort(), ['/nutrition', '/planner', '/quit', '/running', '/sleep', '/trading']);
+  for (const route of ['running', 'nutrition', 'quit', 'sleep', 'trading', 'goals', 'progress', 'planner']) assert.equal(sectionForRoute(route), 'areas');
   assert.equal(sectionForRoute('today'), 'today'); assert.equal(sectionForRoute('history'), 'history');
 });
 test('history keeps imported daily counts intact without inventing individual trades or changing raw data', () => {
